@@ -15,7 +15,8 @@ NAME=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.name)
 VERSION=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version)
 set +x
 
-JAR_PATH="$(pwd)/target/${NAME}-${VERSION}.jar"
+
+JAR_PATH="/var/jenkins_home/workspace/GitHub Pipeline/target/${NAME}-${VERSION}.jar"
 echo "Resolved JAR path: $JAR_PATH"
 
 if [ -f "$JAR_PATH" ]; then
