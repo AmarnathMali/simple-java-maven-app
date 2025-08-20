@@ -15,9 +15,8 @@ NAME=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.name)
 VERSION=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version)
 set +x
 
-JAR_PATH="target/${NAME}-${VERSION}.jar"
-echo "Looking for JAR at: $JAR_PATH"
-ls -l target/
+JAR_PATH="$(pwd)/target/${NAME}-${VERSION}.jar"
+echo "Resolved JAR path: $JAR_PATH"
 
 if [ -f "$JAR_PATH" ]; then
   echo "Running application..."
@@ -26,3 +25,4 @@ else
   echo "ERROR: JAR file not found at $JAR_PATH"
   exit 1
 fi
+
