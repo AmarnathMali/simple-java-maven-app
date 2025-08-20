@@ -1,26 +1,23 @@
 #!/usr/bin/env bash
 
-echo 'The following Maven command installs your Maven-built Java application'
-echo 'into the local Maven repository, which will ultimately be stored in'
-echo 'Jenkins''s local Maven repository (and the "maven-repository" Docker data'
-echo 'volume).'
+echo 'Installing your Maven-built Java application into the local repository...'
 set -x
-mvn jar:jar install:install help:evaluate -Dexpression=project.name
+mvn clean package
+mvn install
 set +x
 
-echo 'The following command extracts the value of the <name/> element'
-echo 'within <project/> of your Java/Maven project''s "pom.xml" file.'
+echo 'Extracting project name and version from pom.xml...'
 set -x
-NAME=`mvn -q -DforceStdout help:evaluate -Dexpression=project.name`
+NAME=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.name)
+VERSION=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version)
 set +x
 
-echo 'The following command behaves similarly to the previous one but'
-echo 'extracts the value of the <version/> element within <project/> instead.'
-set -x
-VERSION=`mvn -q -DforceStdout help:evaluate -Dexpression=project.version`
-set +x
+echo "Running your application: ${NAME}-${VERSION}.jar"
+JAR_PATH="target/${NAME}-${VERSION}.jar"
 
-echo 'The following command runs and outputs the execution of your Java'
-echo 'application (which Jenkins built using Maven) to the Jenkins UI.'
-set -x
-java -jar target/${NAME}-${VERSION}.jar
+if [ -f "$JAR_PATH" ]; then
+  java -jar "$JAR_PATH"
+else
+  echo "ERROR: JAR file not found at $JAR_PATH"
+  exit 1
+fi
