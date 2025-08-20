@@ -1,21 +1,26 @@
 #!/usr/bin/env bash
 
-echo 'Installing your Maven-built Java application into the local repository...'
+cd "$WORKSPACE" || cd "$(pwd)"
+echo "Current directory: $(pwd)"
+
+echo 'Installing and packaging the application...'
 set -x
 mvn clean package
 mvn install
 set +x
 
-echo 'Extracting project name and version from pom.xml...'
+echo 'Extracting project name and version...'
 set -x
 NAME=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.name)
 VERSION=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version)
 set +x
 
-echo "Running your application: ${NAME}-${VERSION}.jar"
 JAR_PATH="target/${NAME}-${VERSION}.jar"
+echo "Looking for JAR at: $JAR_PATH"
+ls -l target/
 
 if [ -f "$JAR_PATH" ]; then
+  echo "Running application..."
   java -jar "$JAR_PATH"
 else
   echo "ERROR: JAR file not found at $JAR_PATH"
