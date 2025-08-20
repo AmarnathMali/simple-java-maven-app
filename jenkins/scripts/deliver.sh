@@ -1,29 +1,22 @@
 #!/usr/bin/env bash
 
-cd "$WORKSPACE" || cd "$(pwd)"
-echo "Current directory: $(pwd)"
-
-echo 'Installing and packaging the application...'
+echo 'The following Maven command installs your Maven-built Java application'
+echo 'into the local Maven repository, which will ultimately be stored in'
+echo 'Jenkins''s local Maven repository (and the "maven-repository" Docker data'
+echo 'volume).'
 set -x
-mvn clean package
-mvn install
+mvn jar:jar install:install help:evaluate -Dexpression=project.name
 set +x
 
-echo 'Extracting project name and version...'
+echo 'The following command extracts the value of the <name/> element'
+echo 'within <project/> of your Java/Maven project''s "pom.xml" file.'
 set -x
-NAME=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.name)
-VERSION=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version)
+NAME=`mvn -q -DforceStdout help:evaluate -Dexpression=project.name`
 set +x
 
-
-JAR_PATH=$(find "$(pwd)/target" -type f -name "${NAME}-${VERSION}.jar" | head -n 1)
-echo "Resolved JAR path: $JAR_PATH"
-
-if [ -f "$JAR_PATH" ]; then
-  echo "Running application..."
-  java -jar "$JAR_PATH"
-else
-  echo "ERROR: JAR file not found at $JAR_PATH"
-  exit 1
-fi
+echo 'The following command behaves similarly to the previous one but'
+echo 'extracts the value of the <version/> element within <project/> instead.'
+set -x
+VERSION=`mvn -q -DforceStdout help:evaluate -Dexpression=project.version`
+set +x
 
